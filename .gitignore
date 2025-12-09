@@ -19,9 +19,7 @@ ipython_config.py
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -36,6 +34,8 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*build/
+*dist/
 
 # PyInstaller
 *.manifest

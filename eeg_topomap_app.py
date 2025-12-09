@@ -1,4 +1,15 @@
-# eeg_gui.py
+# ====================================
+# Nuitka/打包 兼容性补丁 (必须放在最前面)
+# ====================================
+import mne.utils.misc
+
+# 绕过MNE分析源代码 _auto_weakref
+def _bypass_auto_weakref(func):
+    return func
+
+mne.utils.misc._auto_weakref = _bypass_auto_weakref
+# ==========================================
+
 import os
 import tkinter as tk
 from threading import Thread
@@ -22,7 +33,8 @@ class EEGApp:
         self.root = root
         self.root.title("脑电PSD拓扑图绘制工具")
         self.root.geometry("1500x500")
-
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing) # 接管窗口关闭事件
+        
         icon_path = "icon.png"
         if os.path.exists(icon_path):
             img = ttk.PhotoImage(file=icon_path)
@@ -51,11 +63,31 @@ class EEGApp:
         ]
 
         self._setup_ui()
+ 
+        
+    def on_closing(self):
+        """
+        当用户点击窗口右上角 X 关闭时触发。
+        执行清理并强制结束进程。
+        """
+        try:
+            # 关闭 Matplotlib 的所有图形
+            import matplotlib.pyplot as plt
+            plt.close('all') 
+            
+            # 停止 Tkinter 主循环
+            self.root.quit()
+            self.root.destroy()
+        except Exception:
+            pass
+        finally:
+            # 强制终止当前进程
+            os._exit(0)
 
-    # ---------- GUI 布局 ----------
 
     def _setup_ui(self):
-        # 1. 顶部控制栏
+        """搭建 GUI 界面"""
+        # 顶部控制栏
         control_group = ttk.Labelframe(
             self.root, text=" 参数设置 & 操作 ", padding=15, bootstyle="primary"
         )
@@ -120,7 +152,7 @@ class EEGApp:
         )
         self.btn_save.pack(side=LEFT, padx=5)
 
-        # 2. 绘图区域
+        # 绘图区域
         self.plot_container = ttk.Frame(self.root, padding=2)
         self.plot_container.pack(side=TOP, fill=BOTH, expand=True, padx=20, pady=5)
 
@@ -132,7 +164,7 @@ class EEGApp:
         )
         self.placeholder_label.pack(expand=True)
 
-        # 3. 底部状态栏
+        # 底部状态栏
         status_frame = ttk.Frame(self.root, bootstyle="light")
         status_frame.pack(side=BOTTOM, fill=X)
 
@@ -145,11 +177,11 @@ class EEGApp:
         )
         self.lbl_status.pack(side=LEFT, fill=X)
 
-    # ---------- GUI 事件处理 ----------
 
     def browse_file(self):
+        """打开文件对话框选择BDF文件"""
         filename = filedialog.askopenfilename(
-            filetypes=[("BDF files", "*.bdf"), ("All files", "*.*")]
+            filetypes=[("BioSig文件", "*.bdf"), ("All files", "*.*")]
         )
         if filename:
             self.file_path.set(filename)
@@ -184,7 +216,6 @@ class EEGApp:
         except Exception as e:
             self.root.after(0, self.show_error, str(e))
 
-    # ---------- GUI 更新 ----------
 
     def display_result(self, spectrum, processor):
         """在 GUI 中显示 Matplotlib 图像"""
@@ -217,9 +248,9 @@ class EEGApp:
             defaultextension=".png",
             initialfile=initial_name,
             filetypes=[
-                ("PNG Image", "*.png"),
+                ("PNG图像", "*.png"),
                 ("PDF", "*.pdf"),
-                ("SVG", "*.svg"),
+                ("SVG图像", "*.svg"),
             ],
         )
 
@@ -227,7 +258,6 @@ class EEGApp:
             self.current_fig.savefig(file_path, dpi=300, bbox_inches="tight")
             messagebox.showinfo("成功", f"图片已保存至: {file_path}")
 
-    # ---------- 线程安全的状态/错误 ----------
 
     def update_status(self, text: str):
         """线程安全的更新状态栏（供核心模块回调使用）"""

@@ -1,3 +1,8 @@
+# 必须依赖
+
 matplotlib
 mne
 ttkbootstrap
+
+# 打包工具
+Nuitka
