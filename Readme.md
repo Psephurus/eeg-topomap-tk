@@ -5,11 +5,8 @@
 ## 打包命令
 
 使用venv
-```python -m venv venv```
-```venv\Scripts\activate```
+``python -m venv venv``
+``venv\Scripts\activate``
 
-安装Nuitka
-```(venv) pip install Nuitka```
-
-运行打包命令
-```build_nuitka```
+打包命令
+``nuitka eeg_topomap_app.py``

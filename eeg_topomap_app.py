@@ -1,5 +1,20 @@
+## Nuitka 打包配置指令
+# nuitka-project: --standalone
+# nuitka-project: --onefile
+# nuitka-project: --enable-plugin=tk-inter
+# nuitka-project: --include-package-data=mne
+# nuitka-project: --windows-console-mode=disable
+# nuitka-project: --remove-output
+# Nuitka 基础信息
+# nuitka-project: --windows-icon-from-ico=assets/app.ico
+# nuitka-project: --windows-file-version=1.2.0.0
+# nuitka-project: --windows-product-version=1.1
+# nuitka-project: --windows-file-description="脑电地形图分析工具"
+# nuitka-project: --windows-product-name="EEG Topomap App"
+# nuitka-project: --windows-company-name="Personal Research Project"
+# nuitka-project: --copyright="Copyright (c) 2026 Yingxin Gao"
 # ====================================
-# Nuitka/打包 兼容性补丁 (必须放在最前面)
+# Nuitka/打包 兼容性补丁
 # ====================================
 import mne.utils.misc
 
